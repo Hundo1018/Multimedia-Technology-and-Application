@@ -26,7 +26,6 @@ hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
 cv2.imshow("RGB",np.hstack([frameR,frameG,frameB]))
 cv2.imshow("YCrCb,HSV",np.hstack([ycrcb,hsv]))
 cv2.imshow("Gray",gray)
-cv2.waitKey(0)
 
 #line
 cv2.line(frame, (3,3), (300,300), (200,200,255), 2)
