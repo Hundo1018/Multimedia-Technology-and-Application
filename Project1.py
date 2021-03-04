@@ -28,11 +28,11 @@ cv2.imshow("YCrCb,HSV",np.hstack([ycrcb,hsv]))
 cv2.imshow("Gray",gray)
 cv2.waitKey(0)
 
-#line
+#線段
 cv2.line(frame, (3,3), (300,300), (200,200,255), 2)
-#box
+#長方形
 cv2.rectangle(frame, (50,200), (200,260), (0,127,0),2)
-#circle
+#圓圈
 cv2.circle(frame, (50,50), 30, (255,0,0),1)
 
 cv2.imshow("test",frame)
