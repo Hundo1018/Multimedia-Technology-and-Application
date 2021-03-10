@@ -37,3 +37,12 @@ cv2.circle(frame, (50,50), 30, (255,0,0),1)
 cv2.imshow("test",frame)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+#saveAsJpg
+#cv2.imwrite("jpg/gray.jpg", gray)
+#cv2.imwrite("jpg/ycrcb.jpg", ycrcb)
+#cv2.imwrite("jpg/hsv.jpg", hsv)
+#cv2.imwrite("jpg/R.jpg", frameR)
+#cv2.imwrite("jpg/G.jpg", frameG)
+#cv2.imwrite("jpg/B.jpg", frameB)
+#cv2.imwrite("jpg/draw.jpg", frame)
