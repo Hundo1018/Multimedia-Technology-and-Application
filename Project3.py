@@ -27,10 +27,11 @@ num_labels,labels,states,centroids = cv2.connectedComponentsWithStats(eCoinFrame
 #畫方框
 nCoinFrame = coinFrame
 for s in states:
+    print(s)
     cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,0,127),1)
 
 #顯示
-cv2.imshow(str(i),np.hstack([nCoinFrame]))
+cv2.imshow("",np.hstack([nCoinFrame]))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
