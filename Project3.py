@@ -1,8 +1,18 @@
 import cv2
 import numpy as np
 
+
+#
+# 第一題
+#
+def food_1():
+    print("nothing in food_1")
+
+
+#
 # 第二題
-def Quiz_2():
+#
+def food_2():
     # read
     floor = cv2.imread("floor.jpg")
 
@@ -28,13 +38,32 @@ def Quiz_2():
         cv2.line(floor, (p[0], p[1]), (p[2], p[3]),
                  color=(0, 0, 255), thickness=2)
 
-    cv2.imshow("q2_result", floor)
+    cv2.imshow("food", floor)
     cv2.waitKey()
-    print("Q2 ok?")
+    print("food_2 is good")
 
+
+#
+# 第三題
+#
+def food_3():
+    print("nothing in food_3")
+
+
+#
+# 第四題
+#
+def food_4():
+    print("nothing in food_4")
+
+
+#
 # main function
+#
 def main():
-    Quiz_2()
+    # food_1()
+    food_2()
+    # food_3()
+    # food_4()
 
-# main
 main()
