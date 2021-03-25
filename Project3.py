@@ -29,10 +29,8 @@ def Quiz_2():
                  color=(0, 0, 255), thickness=2)
 
     cv2.imshow("q2_result", floor)
-    cv2.imwrite("floor_r.jpg", np.hstack([floor_BIN, floor_close]))
-    cv2.imwrite("floor_line.jpg", floor)
     cv2.waitKey()
-    print("done")
+    print("Q2 ok?")
 
 # main function
 def main():
