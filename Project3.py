@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 
-
 #
 # 第一題
 #
