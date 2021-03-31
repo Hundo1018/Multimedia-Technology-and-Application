@@ -131,12 +131,12 @@ def food_1():
                 cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,0,255),2)
     cv2.putText(nCoinFrame, 'total:'+str(total), (12,20), cv2.FONT_HERSHEY_SIMPLEX,0.5,    (255,255,255), 1, cv2.LINE_AA)   
 
-    cv2.imshow("e",eCoinFrame)
+    #cv2.imshow("e",eCoinFrame)
     #顯示
-    cv2.imshow("",np.hstack([nCoinFrame]))
+    cv2.imshow("1",np.hstack([nCoinFrame]))
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
 #
 # 第二題
@@ -167,9 +167,9 @@ def food_2():
         cv2.line(floor, (p[0], p[1]), (p[2], p[3]),
                  color=(0, 0, 255), thickness=2)
 
-    cv2.imshow("food", floor)
-    cv2.waitKey()
-    print("food_2 is good")
+    cv2.imshow("2", floor)
+    #cv2.waitKey()
+    #print("food_2 is good")
 
 
 #
@@ -247,15 +247,160 @@ def food_3():
     cv2.putText(nCoinFrame, 'total:'+str(total), (12,20), cv2.FONT_HERSHEY_SIMPLEX,0.5,    (255,255,255), 1, cv2.LINE_AA)   
             
     #顯示
-    cv2.imshow("",np.hstack([nCoinFrame]))
+    cv2.imshow("3",np.hstack([nCoinFrame]))
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+
 #
 # 第四題
 #
 def food_4():
-    print("nothing in food_4")
+    appleFrame = cv2.imread("apple.jpg")
+    orangeFrame = cv2.imread("orange.jpg")
+
+
+    w = appleFrame.shape[0]
+
+    #resize縮小影像
+    w=w//2
+    #daINTER_NEAREST =cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_NEAREST)
+    daINTER_LINEAR  =cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_LINEAR)
+    #daINTER_AREA    =cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_AREA)
+    #daINTER_CUBIC   =cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_CUBIC)
+    #daINTER_LANCZOS4=cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_LANCZOS4)
+
+    #doINTER_NEAREST =cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_NEAREST)
+    doINTER_LINEAR  =cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_LINEAR)
+    #doINTER_AREA    =cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_AREA)
+    #doINTER_CUBIC   =cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_CUBIC)
+    #doINTER_LANCZOS4=cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_LANCZOS4)
+    
+    ##組合
+    #aoINTER_NEAREST  = np.hstack([daINTER_NEAREST [:,:w//2],doINTER_NEAREST [:,w//2:]])
+    aoINTER_LINEAR   = np.hstack([daINTER_LINEAR  [:,:w//2],doINTER_LINEAR  [:,w//2:]])
+    #aoINTER_AREA     = np.hstack([daINTER_AREA    [:,:w//2],doINTER_AREA    [:,w//2:]])
+    #aoINTER_CUBIC    = np.hstack([daINTER_CUBIC   [:,:w//2],doINTER_CUBIC   [:,w//2:]])
+    #aoINTER_LANCZOS4 = np.hstack([daINTER_LANCZOS4[:,:w//2],doINTER_LANCZOS4[:,w//2:]])
+    smallW = w//2
+    bigW = w*2
+    blurV = 5
+    blurV2 = 7
+
+    border = 7
+    #模糊
+    #blurV = 17
+    #BaoINTER_NEAREST =cv2.blur(    aoINTER_NEAREST ,(blurV,blurV))
+    BaoINTER_LINEAR  =cv2.blur(    aoINTER_LINEAR  ,(blurV,blurV))
+
+    #BaoINTER_AREA    =cv2.blur(    aoINTER_AREA    ,(blurV,blurV))
+    #BaoINTER_CUBIC   =cv2.blur(    aoINTER_CUBIC   ,(blurV,blurV))
+    #BaoINTER_LANCZOS4=cv2.blur(    aoINTER_LANCZOS4,(blurV,blurV))
+
+    #複製
+    #IaoINTER_NEAREST =aoINTER_NEAREST 
+    IaoINTER_LINEAR  =aoINTER_LINEAR  
+    #IaoINTER_AREA    =aoINTER_AREA    
+    #IaoINTER_CUBIC   =aoINTER_CUBIC   
+    #IaoINTER_LANCZOS4=aoINTER_LANCZOS4
+
+    #插到中間
+    #border = 9
+    #IaoINTER_NEAREST [::,smallW-border:smallW+border] =  BaoINTER_NEAREST [::,smallW-border:smallW+border]
+    IaoINTER_LINEAR  [::,smallW-border:smallW+border] =  BaoINTER_LINEAR  [::,smallW-border:smallW+border]
+    #IaoINTER_AREA    [::,smallW-border:smallW+border] =  BaoINTER_AREA    [::,smallW-border:smallW+border]
+    #IaoINTER_CUBIC   [::,smallW-border:smallW+border] =  BaoINTER_CUBIC   [::,smallW-border:smallW+border]
+    #IaoINTER_LANCZOS4[::,smallW-border:smallW+border] =  BaoINTER_LANCZOS4[::,smallW-border:smallW+border]
+    #w=w*2
+
+    #放大
+    
+    #UaoINTER_NEAREST =cv2.resize(IaoINTER_NEAREST ,(bigW,bigW),interpolation=cv2.INTER_NEAREST)
+    UaoINTER_LINEAR  =cv2.resize(IaoINTER_LINEAR  ,(bigW,bigW),interpolation=cv2.INTER_LINEAR)
+    #UaoINTER_AREA    =cv2.resize(IaoINTER_AREA    ,(bigW,bigW),interpolation=cv2.INTER_AREA)
+    #UaoINTER_CUBIC   =cv2.resize(IaoINTER_CUBIC   ,(bigW,bigW),interpolation=cv2.INTER_CUBIC)
+    #UaoINTER_LANCZOS4=cv2.resize(IaoINTER_LANCZOS4,(bigW,bigW),interpolation=cv2.INTER_LANCZOS4)
+
+    #再次模糊
+    #blurV2 = 7
+    #NaoINTER_NEAREST =cv2.blur(    UaoINTER_NEAREST ,(blurV2,blurV2))
+    NaoINTER_LINEAR  =cv2.blur(    UaoINTER_LINEAR  ,(blurV2,blurV2))
+    #NaoINTER_AREA    =cv2.blur(    UaoINTER_AREA    ,(blurV2,blurV2))
+    #NaoINTER_CUBIC   =cv2.blur(    UaoINTER_CUBIC   ,(blurV2,blurV2))
+    #NaoINTER_LANCZOS4=cv2.blur(    UaoINTER_LANCZOS4,(blurV2,blurV2))
+    
+
+    #顯示
+    #cv2.imshow("aoINTER_NEAREST "+str(blurV)+","+str(blurV2)+","+str(border),NaoINTER_NEAREST )
+    #cv2.imshow("aoINTER_LINEAR  "+str(blurV)+","+str(blurV2)+","+str(border),NaoINTER_LINEAR  )
+    cv2.imshow("4",NaoINTER_LINEAR  )
+    #cv2.imshow("aoINTER_AREA    "+str(blurV)+","+str(blurV2)+","+str(border),NaoINTER_AREA    )
+    #cv2.imshow("aoINTER_CUBIC   "+str(blurV)+","+str(blurV2)+","+str(border),NaoINTER_CUBIC   )
+    #cv2.imshow("aoINTER_LANCZOS4"+str(blurV)+","+str(blurV2)+","+str(border),NaoINTER_LANCZOS4)
+    '''
+    w = appleFrame.shape[0]
+    w=w//4
+    #apple向下
+    danearFrame =   cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_NEAREST)
+    dalinearFrame = cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_LINEAR)
+    daareaFrame =   cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_AREA)
+    dacubicFrame =  cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_CUBIC)
+    dalanczsFrame = cv2.resize(appleFrame,(w,w),interpolation=cv2.INTER_LANCZOS4)
+
+    #orange向下
+    donearFrame = cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_NEAREST)
+    dolinearFrame = cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_LINEAR)
+    doareaFrame = cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_AREA)
+    docubicFrame = cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_CUBIC)
+    dolanczsFrame = cv2.resize(orangeFrame,(w,w),interpolation=cv2.INTER_LANCZOS4)
+
+    #合併
+    nearhsFrame = np.hstack([    danearFrame[:,0:w//2], donearFrame[:,w//2:w]  ])
+    linehsFrame = np.hstack([    dalinearFrame[:,0:w//2],dolinearFrame[:,w//2:w]  ])
+    areahsFrame = np.hstack([    daareaFrame[:,0:w//2],doareaFrame[:,w//2:w]  ])
+    cubhsFrame = np.hstack([    dacubicFrame[:,0:w//2],docubicFrame[:,w//2:w]  ])
+    lanhsFrame = np.hstack([    dalanczsFrame[:,0:w//2],dolanczsFrame[:,w//2:w]  ])
+    
+    #模糊
+    ksize = 5
+    BnearhsFrame = cv2.blur(nearhsFrame, (ksize, ksize))
+    BlinehsFrame = cv2.blur(linehsFrame, (ksize, ksize))
+    BareahsFrame = cv2.blur(areahsFrame, (ksize, ksize))
+    BcubhsFrame  = cv2.blur(cubhsFrame , (ksize, ksize))
+    BlanhsFrame  = cv2.blur(lanhsFrame , (ksize, ksize))
+    NnearhsFrame = nearhsFrame
+    NlinehsFrame = linehsFrame
+    NareahsFrame = areahsFrame
+    NcubhsFrame  = cubhsFrame 
+    NlanhsFrame  = lanhsFrame 
+
+    #中間換成模糊
+    w=w//4
+    border = 100
+    #NnearhsFrame[::,w-border:w+border] =  BnearhsFrame[::,w-border:w+border]
+    #NlinehsFrame[::,w-border:w+border] =  BlinehsFrame[::,w-border:w+border]
+    #NareahsFrame[::,w-border:w+border] =  BareahsFrame[::,w-border:w+border]
+    #NcubhsFrame [::,w-border:w+border] =  BcubhsFrame [::,w-border:w+border]
+    #NlanhsFrame [::,w-border:w+border] =  BlanhsFrame [::,w-border:w+border]
+    w=w*4
+
+
+    #upFrame = cv2.pyrUp(hsFrame)
+    w=w*4
+
+    NnearhsFrame = cv2.resize(     NnearhsFrame ,(w,w),interpolation=cv2.INTER_NEAREST)
+    NlinehsFrame = cv2.resize(   NlinehsFrame ,(w,w),interpolation=cv2.INTER_LINEAR)
+    NareahsFrame = cv2.resize(     NareahsFrame ,(w,w),interpolation=cv2.INTER_AREA)
+    NcubhsFrame  = cv2.resize(    NcubhsFrame  ,(w,w),interpolation=cv2.INTER_CUBIC)
+    NlanhsFrame  = cv2.resize(   NlanhsFrame  ,(w,w),interpolation=cv2.INTER_LANCZOS4)
+
+
+
+    #cv2.imshow("up", upFrame)
+    cv2.imshow("near",  NnearhsFrame )
+    cv2.imshow("line",  NlinehsFrame )
+    cv2.imshow("area",  NareahsFrame )
+    cv2.imshow("cub",   NcubhsFrame  )
+    cv2.imshow("lan",   NlanhsFrame  )
+    '''
 
 
 #
@@ -263,8 +408,9 @@ def food_4():
 #
 def main():
     food_1()
-    #food_2()
-    #food_3()
-    # food_4()
-
+    food_2()
+    food_3()
+    food_4()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 main()
