@@ -38,7 +38,7 @@ def food_1():
 
     #畫方框
     nCoinFrame = coinFrame
-    
+    total = 0
     if (usingKMean):
         l = []#資料點
         lSets = []#資料點對應群集
@@ -52,7 +52,7 @@ def food_1():
             lSets.append(0)
 
 
-        #有1元5元10元50元，分成4群
+        #有1元5元10元50元，依照面積大小與Hue值分成4群
         #分類的點K，先放前四個
         for i in l[:4]:
             kPoints.append([i[0],i[1]])
@@ -118,13 +118,18 @@ def food_1():
             #cv2.putText(nCoinFrame, str(s[4]), (s[0], s[1]), cv2.FONT_HERSHEY_SIMPLEX,0.5, (0, 255, 255), 1, cv2.LINE_AA)
             #畫方框
             if s[4]>=1900:
+                total+=50
                 cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,255,0),2)
             elif s[4]>=1100:
+                total+=10
                 cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,255,255),2)
             elif s[4]>=900:
+                total+=5
                 cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(80,127,255),2)
             elif s[4]>=0:
+                total+=1
                 cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,0,255),2)
+    cv2.putText(nCoinFrame, 'total:'+str(total), (12,20), cv2.FONT_HERSHEY_SIMPLEX,0.5,    (255,255,255), 1, cv2.LINE_AA)   
 
     cv2.imshow("e",eCoinFrame)
     #顯示
@@ -171,9 +176,81 @@ def food_2():
 # 第三題
 #
 def food_3():
-    print("nothing in food_3")
+    #讀取
+    coinFrame = cv2.imread("coin2.jpg")
+
+    #resize
+    nH =(int)( coinFrame.shape[0]/8)
+    nW =(int)( coinFrame.shape[1]/8)
+    coinFrame = cv2.resize(coinFrame,(nW,nH),interpolation=cv2.INTER_AREA)
+
+    #灰階
+    gCoinFrame = cv2.cvtColor(coinFrame,cv2.COLOR_BGR2GRAY)
+
+    #HSV
+    hsvCoinFrame = cv2.cvtColor(coinFrame, cv2.COLOR_BGR2HSV)
+
+    #濾波
+    fCoinFrame = cv2.bilateralFilter(gCoinFrame,100,60,10)
+    #cv2.imshow("f",fCoinFrame)
+
+    #二值化
+    temp ,bCoinFrame =cv2.threshold(fCoinFrame,75,255,cv2.THRESH_BINARY )
 
 
+
+    eCoinFrame = bCoinFrame
+    #開運算
+    #把硬幣分離
+    eCoinFrame = cv2.morphologyEx(eCoinFrame, cv2.MORPH_OPEN, np.ones((3,3)),iterations = 5)
+
+
+    #物件連通
+    num_labels,labels,states,centroids = cv2.connectedComponentsWithStats(eCoinFrame,connectivity=8)
+    total = 0
+    #畫方框
+    nCoinFrame = coinFrame
+    for s in states[1:]:
+            #畫方框
+            #cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,255,0),2)
+            #標記數值
+            #cv2.putText(nCoinFrame, str(s[4]), (s[0], s[1]), cv2.FONT_HERSHEY_SIMPLEX,0.5, (0, 255, 255), 1, cv2.LINE_AA)
+            
+            if s[4]<=650:#1
+                total += 1
+                cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,0,255),2)#紅色
+                cv2.putText(nCoinFrame, '1', (s[0]+s[2]//4, s[1]+s[3]//2), cv2.FONT_HERSHEY_SIMPLEX,0.5,    (0,0,0), 2, cv2.LINE_AA)
+            elif s[4]<=750:#5
+                total += 5
+                cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(80,127,255),2)#橘色
+                cv2.putText(nCoinFrame, '5', (s[0]+s[2]//4, s[1]+s[3]//2), cv2.FONT_HERSHEY_SIMPLEX,0.5,    (0,0,0), 2, cv2.LINE_AA)
+            elif s[4]<=1100:#10
+                total += 10
+                cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,255,255),2)#黃色
+                cv2.putText(nCoinFrame, '10', (s[0]+s[2]//4, s[1]+s[3]//2), cv2.FONT_HERSHEY_SIMPLEX,0.5,   (0,0,0), 2, cv2.LINE_AA)
+            elif s[4]<=1450:#50
+                total += 50
+                cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(0,255,0),2)#綠色
+                cv2.putText(nCoinFrame, '50', (s[0]+s[2]//4, s[1]+s[3]//2), cv2.FONT_HERSHEY_SIMPLEX,0.5,   (0,0,0), 2, cv2.LINE_AA)
+            elif s[4]<=21000:#500
+                total += 500
+                cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(127,0,127),2)#紫
+                cv2.putText(nCoinFrame, '500', (s[0]+s[2]//4, s[1]+s[3]//2), cv2.FONT_HERSHEY_SIMPLEX,0.5,  (0,0,0), 2, cv2.LINE_AA)
+            elif s[4]<=21400:#100
+                total += 100
+                cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(255,0,0),2)#藍
+                cv2.putText(nCoinFrame, '100', (s[0]+s[2]//4, s[1]+s[3]//2), cv2.FONT_HERSHEY_SIMPLEX,0.5,  (0,0,0), 2, cv2.LINE_AA)
+            elif s[4]<=22000:#1000
+                total += 1000
+                cv2.rectangle(nCoinFrame,(s[0],s[1]),(s[2]+s[0],s[3]+s[1]),(255,255,255),2)#白
+                cv2.putText(nCoinFrame, '1000', (s[0]+s[2]//4, s[1]+s[3]//2), cv2.FONT_HERSHEY_SIMPLEX,0.5, (0,0,0), 2, cv2.LINE_AA)
+    cv2.putText(nCoinFrame, 'total:'+str(total), (12,20), cv2.FONT_HERSHEY_SIMPLEX,0.5,    (255,255,255), 1, cv2.LINE_AA)   
+            
+    #顯示
+    cv2.imshow("",np.hstack([nCoinFrame]))
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 #
 # 第四題
 #
@@ -186,8 +263,8 @@ def food_4():
 #
 def main():
     food_1()
-    food_2()
-    # food_3()
+    #food_2()
+    #food_3()
     # food_4()
 
 main()
