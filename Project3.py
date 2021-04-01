@@ -277,10 +277,10 @@ def food_4():
 
     smallW = w//2
     bigW = w*2
-    blurV = 5
-    blurV2 = 7
+    blurV = 9
+    blurV2 = 9
 
-    border = 7
+    border = 20
 
     #模糊
     BaoINTER_LINEAR  =cv2.blur(    aoINTER_LINEAR  ,(blurV,blurV))
