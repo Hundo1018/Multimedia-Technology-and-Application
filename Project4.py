@@ -27,16 +27,19 @@ def foo(in_x, in_y, in_kernel, in_c, in_gamma, in_sizeTest):
 # main function
 #
 def main():
-    kernelList = ['linear', 'poly', 'rbf', 'sigmoid']
-    scoreList = []
-
     wine = datasets.load_wine()
-    #example x=foo(wine.data, wine.target, 'linear', 1, 'auto', 0.8)
+    x = []
+    y = []
+    for i in range(len(wine.data[:,0])):
+        x.append( [wine.data[:,0][i],wine.data[:,2][i]])
+        y.append( wine.target[i])
+    result = foo(x,y,'poly',5,0.5,0.2)[1]
+    print('kernel:poly\nc:5\ngamma:0.5\nsize_test:0.2\n準確率',result)
 
 
     #sizeTest
     plt.figure(1, (10, 6))
-    for kernel in kernelList:
+    for kernel in ['linear', 'poly', 'rbf', 'sigmoid']:
         scoreList = []
         for size in np.linspace(0.05, 0.95, 100):
             scoreList.append(foo(wine.data, wine.target, kernel, 1, 'auto', size))
@@ -47,18 +50,6 @@ def main():
     plt.ylabel('score')
     plt.title("sizeTest")
 
-
-
-    #example
-    plt.figure(2)
-
-    plt.legend()
-    plt.xlabel('test_size')
-    plt.ylabel('score')
-    plt.title("sizeTest")
-
-
-    plt.show()
 
 
 main()
