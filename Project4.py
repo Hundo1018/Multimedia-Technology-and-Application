@@ -28,8 +28,14 @@ def foo(in_x, in_y, in_kernel, in_c, in_gamma, in_sizeTest):
 #
 def main():
     #
-    # wine = datasets.load_wine()
-    # x=foo(wine.data, wine.target, 'linear', 1, 'auto', 0.8)
+    wine = datasets.load_wine()
+    x = []
+    y = []
+    for i in range(len(wine.data[:,0])):
+        x.append( [wine.data[:,0][i],wine.data[:,2][i]])
+        y.append( wine.target[i])
+    result = foo(x,y,'poly',5,0.5,0.2)[1]
+    print('kernel:poly\nc:5\ngamma:0.5\nsize_test:0.2\n準確率',result)
 
 
 main()
