@@ -38,20 +38,34 @@ def main():
     print('kernel:poly\nc:5\ngamma:0.5\nsize_test:0.2\n準確率',result)
 
 
-    #sizeTest
+    #test_size C:1 gamma:auto
     plt.figure(1, (10, 6))
     for kernel in ['linear', 'poly', 'rbf', 'sigmoid']:
         scoreList = []
         for size in np.linspace(0.05, 0.95, 100):
             scoreList.append(foo(wine.data, wine.target, kernel, 1, 'auto', size))
         plt.plot(np.linspace(0.05, 0.95, 100), scoreList, label=kernel)
-
     plt.legend()
     plt.xlabel('test_size')
     plt.ylabel('score')
-    plt.title("sizeTest (C:1 gamma:auto)")
+    plt.title("test_size change (C:1 gamma:auto)")
+
+
+    #test_size C:1 gamma:scale
+    plt.figure(2, (10, 6))
+    for kernel in ['linear', 'poly', 'rbf', 'sigmoid']:
+        scoreList = []
+        for size in np.linspace(0.05, 0.95, 100):
+            scoreList.append(foo(wine.data, wine.target, kernel, 1, 'scale', size))
+        plt.plot(np.linspace(0.05, 0.95, 100), scoreList, label=kernel)
+    plt.legend()
+    plt.xlabel('test_size')
+    plt.ylabel('score')
+    plt.title("test_size change (C:1 gamma:scale)")
+
 
     plt.show()
+
 
 
 
