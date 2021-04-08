@@ -27,6 +27,7 @@ def foo(in_x, in_y, in_kernel, in_c, in_gamma, in_sizeTest):
 # main function
 #
 def main():
+
     wine = datasets.load_wine()
     x = []
     y = []
@@ -48,7 +49,9 @@ def main():
     plt.legend()
     plt.xlabel('test_size')
     plt.ylabel('score')
-    plt.title("sizeTest")
+    plt.title("sizeTest (C:1 gamma:auto)")
+
+    plt.show()
 
 
 
