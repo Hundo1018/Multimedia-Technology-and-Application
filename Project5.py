@@ -44,6 +44,7 @@ def imageToHog(imageList):
 		#resultArray = np.append(resultArray, [fd], axis=0)
 	return resultArray
 
+
 def train(data,target):
 	x_train,x_test,y_train,y_test = train_test_split(data,target,test_size=0.2,random_state=0)
 	clf = svm.SVC(kernel="linear",C=1,gamma='auto')
@@ -57,7 +58,7 @@ def train(data,target):
 	nsamplesTest ,nx,ny = x_test.shape
 	d2_x_test = x_test.reshape((nsamplesTest,nx*ny))
 	clf.fit(d2_x_train,y_train)
-	return clf.score(d2_x_test,y_test)
+	return clf,d2_x_train,y_train,d2_x_test,y_test
 def readData():
 	imgList = []
 	labelList = []
@@ -92,5 +93,12 @@ def main():
 	#example()
 	images,target = readData()
 	Hogs = imageToHog(images)
-	print(train(Hogs,target))
+	clf,x_train,y_train,x_test,y_test = train(Hogs,target)
+	print("predict")
+	print(clf.predict(x_train))
+	print(clf.predict(x_test))
+	print("Accuracy:")
+	print(clf.score(x_train,y_train))
+	print(clf.score(x_test,y_test))
+
 main()
