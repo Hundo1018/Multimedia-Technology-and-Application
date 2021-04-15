@@ -36,18 +36,28 @@ def example():
 
 
 def imageToHog(imageList):
-	resultArray = np.array([])
+	#resultArray = np.array([])
+	resultArray = []
 	for img in imageList:
-		fd, hog_image = hog(img, orientations=9, pixels_per_cell=(8,8), cells_per_block=(3,3),
-		visualize=False, multichannel=True)
-		np.append(resultArray, [fd], axis=0)
+		fd = hog(img, orientations=9, pixels_per_cell=(8,8), cells_per_block=(3,3),visualize=False, multichannel=True)
+		resultArray.append([fd])
+		#resultArray = np.append(resultArray, [fd], axis=0)
 	return resultArray
 
 def train(data,target):
 	x_train,x_test,y_train,y_test = train_test_split(data,target,test_size=0.2,random_state=0)
-	slf = svm.SVC(kernel="linear",c=1,gamma='auto')
-	clf.fit(x_train,y_train)
-	return clf.score(x_test,y_test)
+	clf = svm.SVC(kernel="linear",C=1,gamma='auto')
+	#reshape
+	x_train = np.array(x_train)
+	nsamples, nx, ny = x_train.shape
+	d2_x_train = x_train.reshape((nsamples,nx*ny))#9072*1674
+
+	#reshape2
+	x_test = np.array(x_test)
+	nsamplesTest ,nx,ny = x_test.shape
+	d2_x_test = x_test.reshape((nsamplesTest,nx*ny))
+	clf.fit(d2_x_train,y_train)
+	return clf.score(d2_x_test,y_test)
 def readData():
 	imgList = []
 	labelList = []
@@ -56,7 +66,10 @@ def readData():
 	for i in range(1,73):
 		for j in range(1,11):
 			image = cv2.imread("CAVIAR4REID/CAVIARa/"+"%04d"%i+"%03d"%j+".jpg")
-			image = cv2.resize(image, (72, 144), interpolation=cv2.INTER_AREA)
+			image = cv2.resize(image, (144, 72), interpolation=cv2.INTER_AREA)
+			#fd, hog_image = hog(image, orientations=9, pixels_per_cell=(8,8), cells_per_block=(3,3),visualize=False, multichannel=True)
+
+
 			imgList.append(image)
 			labelList.append(label)
 	rootpath = "voc2005_1/VOC2005_1/PNGImages/"
@@ -67,7 +80,7 @@ def readData():
 			label = 1
 		for j in listdir(rootpath+i):
 			image = cv2.imread(rootpath+"/"+i+"/"+j)
-			image = cv2.resize(image, (72, 144), interpolation=cv2.INTER_AREA)
+			image = cv2.resize(image, (144, 72), interpolation=cv2.INTER_AREA)
 			imgList.append(image)
 			labelList.append(label)
 	return imgList,labelList
