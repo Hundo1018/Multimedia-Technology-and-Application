@@ -9,18 +9,17 @@ from skimage import data, exposure
 
 from os import listdir
 
+
 def example():
-	img = data.astronaut()
-
+	img = cv.imread("example.jpg")
 	gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
 	sift = cv.SIFT_create()
-
 	kp, des = sift.detectAndCompute(gray, None)
 
-	img = cv.drawKeyPoints(gray, kp, img, flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+	img = cv.drawKeypoints(gray, kp, img, flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 	cv.imshow('wow', img)
+	cv.waitKey()
 
 def train(data,target):
 	x_train,x_test,y_train,y_test = train_test_split(data,target,test_size=0.2,random_state=0)
