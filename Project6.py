@@ -16,6 +16,7 @@ def example():
 	sift = cv.SIFT_create()
 	kp, des = sift.detectAndCompute(gray, None)
 
+	#draw
 	img = cv.drawKeypoints(gray, kp, img, flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 	cv.imshow('wow', img)
@@ -24,6 +25,7 @@ def example():
 def train(data,target):
 	x_train,x_test,y_train,y_test = train_test_split(data,target,test_size=0.2,random_state=0)
 	clf = svm.SVC(kernel="linear",C=1,gamma='auto')
+
 	#reshape
 	x_train = np.array(x_train)
 	nsamples, nx, ny = x_train.shape
@@ -35,6 +37,7 @@ def train(data,target):
 	d2_x_test = x_test.reshape((nsamplesTest,nx*ny))
 	clf.fit(d2_x_train,y_train)
 	return clf,d2_x_train,y_train,d2_x_test,y_test
+
 def readData():
 	imgList = []
 	labelList = []
@@ -61,6 +64,8 @@ def readData():
 			imgList.append(image)
 			labelList.append(label)
 	return imgList,labelList
+
+def img2sift
 
 
 
