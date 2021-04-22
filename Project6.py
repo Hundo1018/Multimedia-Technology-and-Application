@@ -1,77 +1,66 @@
+from posix import XATTR_CREATE
 import numpy as np
-import cv2 as cv
-
+import cv2
+import os
 from sklearn.model_selection import train_test_split
 from sklearn import svm
+from sklearn.preprocessing import StandardScaler
+from scipy.cluster.vq import *
+from imutils import paths
 
-from skimage.feature import hog
-from skimage import data, exposure
+train_path = "dataset/train"
+training_names = os.listdir(train_path)
 
-from os import listdir
+image_paths = []
+image_classes = []
+class_id = 0
+for training_name in training_names:
+	dir = os.path.join(train_path, training_name)
+	class_path = list(paths.list_images(dir))
+	image_paths += class_path
+	image_classes += [class_id] * len(class_path)
+	class_id += 1
 
+sift = cv2.SIFT_create()
 
-def example():
-	img = cv.imread("example.jpg")
-	gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-	sift = cv.SIFT_create()
-	kp, des = sift.detectAndCompute(gray, None)
+des_list = []
 
-	#draw
-	img = cv.drawKeypoints(gray, kp, img, flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+for image_path in image_paths:
+	im = cv2.imread(image_path)
+	im = cv2.resize(im, (300, 300))
+	kpts = sift.detect(im)
+	kpts, des = sift.compute(im, kpts)
+	des_list.append((image_path, des))
+	print("Image file path : ", image_path)
 
-	cv.imshow('wow', img)
-	cv.waitKey()
+descriptors = des_list[0][1]
+for image_path, descriptor in des_list[1:]:
+	descriptors = np.vstack((descriptors, descriptor))
 
-def train(data,target):
-	x_train,x_test,y_train,y_test = train_test_split(data,target,test_size=0.2,random_state=0)
-	clf = svm.SVC(kernel="linear",C=1,gamma='auto')
+k = 20
+voc, variance = kmeans(descriptors, k, 1)
 
-	#reshape
-	x_train = np.array(x_train)
-	nsamples, nx, ny = x_train.shape
-	d2_x_train = x_train.reshape((nsamples,nx*ny))#9072*1674
+im_features = np.zeros((len(image_paths), k), "float32")
+for i in range(len(image_paths)):
+	words, distance = vq(des_list[i][1], voc)
+	for w in words:
+		im_features[i][w] += 1
 
-	#reshape2
-	x_test = np.array(x_test)
-	nsamplesTest ,nx,ny = x_test.shape
-	d2_x_test = x_test.reshape((nsamplesTest,nx*ny))
-	clf.fit(d2_x_train,y_train)
-	return clf,d2_x_train,y_train,d2_x_test,y_test
+x = im_features
+y = np.array(image_classes)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
 
-def readData():
-	imgList = []
-	labelList = []
-	label = 0
+clf = svm.SVC(kernel="linear",C=1,gamma='auto')
+clf.fit(x_train,y_train)
 
-	for i in range(1,73):
-		for j in range(1,11):
-			image = cv.imread("CAVIAR4REID/CAVIARa/"+"%04d"%i+"%03d"%j+".jpg")
-			image = cv.resize(image, (144, 72), interpolation=cv.INTER_AREA)
-			#fd, hog_image = hog(image, orientations=9, pixels_per_cell=(8,8), cells_per_block=(3,3),visualize=False, multichannel=True)
+print("predict")
+print(clf.predict(x_train))
+print(clf.predict(x_test))
 
+print("Accuracy:")
+print(clf.score(x_train,y_train))
+print(clf.score(x_test,y_test))
 
-			imgList.append(image)
-			labelList.append(label)
-	rootpath = "voc2005_1/VOC2005_1/PNGImages/"
-	for i in listdir(rootpath):
-		if i == "TUGraz_person":
-			label = 0
-		else:
-			label = 1
-		for j in listdir(rootpath+i):
-			image = cv.imread(rootpath+"/"+i+"/"+j)
-			image = cv.resize(image, (144, 72), interpolation=cv.INTER_AREA)
-			imgList.append(image)
-			labelList.append(label)
-	return imgList,labelList
+stdslr = StandardScaler().fit(im_features)
+im_features = stdslr.transform(im_features)
 
-def img2sift
-
-
-
-#main
-def main():
-	example()
-
-
-main()
