@@ -2,3 +2,4 @@ workspace.code-workspace
 .vscode/settings.json
 CAVIAR4REID/
 voc2005_1/
+dataset/
