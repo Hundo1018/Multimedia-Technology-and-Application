@@ -62,8 +62,8 @@ def identifyHand(img, svm):
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	img = cv2.resize(img, (500, 500))
 	sift = cv2.SIFT_create()
-	kpts, des = sift.detectAndCompute(img, None)
-	result = svm.predict(kpts.flatten())
+	kp, des = sift.detectAndCompute(img, None)
+	result = svm.predict(des.flatten())
 	return result
 
 
@@ -118,28 +118,68 @@ def svmTraining(X, Y, model_name):
 	model = svm.SVC(kernel='linear', C=1, gamma='auto')
 	model.fit(X, Y)
 
-	print("此次訓練自我良好準確率為: ", model.score(X, Y))
+	print("此次訓練自我感覺良好準確率為: ", model.score(X, Y))
 
 	# 保存model
 	joblib.dump(model, model_name + '.pkl')
 
 
-# svm預測區
-def svmPrediction():
-	pass
+# 從攝影機擷取影像
+def getImgFromCamara():
+	# 選擇第ㄧ隻攝影機
+	cap = cv2.VideoCapture(0)
+	while(True):
+		# 從攝影機擷取一張影像
+		ret, frame = cap.read()
+		# 顯示圖片
+		cv2.imshow('frame', frame)
+		# 若按下 q 鍵則離開迴圈
+		if cv2.waitKey(1) & 0xFF == ord('q'):
+			break
+	# 釋放攝影機
+	cap.release()
+	# 關閉所有 OpenCV 視窗
+	cv2.destroyAllWindows()
+	return frame
 
 
+# 特徵提取
+def exeImgToSIFT(img_list):
+	flag = 0
+	sift = cv2.SIFT_create()
+	for img in img_list:
+		kpts, des = sift.detectAndCompute(img, None)
+		# need FIX
+		if flag == 0:
+			result_array = des
+		else:
+			np.append(result_array, des.flatten())
+		flag = 1
+	return result_array
+
+
+# 資料集產生流程
+# 擷取影像加到array
+# 設定target到array
+# 一直重複
 # 訓練集產生器
 def TrainingDataGenerator():
-
+	# TODO:
+	pass
 
 def main():
+	img = getImgFromCamara()
+	img2 = getImgFromCamara()
+	aasd = [img, img2]
+	resList = exeImgToSIFT(aasd)
+
 	# 訓練
-	X, Y = TrainingDataGenerator()
-	svmTraining()
+	# X, Y = TrainingDataGenerator()
+	# svmTraining(X, Y, 'hand')
 
 	# 剪刀石頭布主程式，不包含訓練
 	# RockPaperScissors()
+	print('good')
 
 main()
 
