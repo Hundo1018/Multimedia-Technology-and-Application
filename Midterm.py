@@ -9,41 +9,56 @@ from sklearn.preprocessing import StandardScaler
 from scipy.cluster.vq import *
 from imutils import paths
 
-# 0: user loss
-# 1: user tie
-# 2: user win
-def resultRockPaperScissors(user, bot):
-	if user == 0:
-		if bot == 0:
-			return 1
-		elif bot == 1:
-			return 0
-		elif bot == 2:
-			return 2
-		else:
-			return 'bot ERROR'
-	elif user == 1:
-		if bot == 0:
-			return 2
-		elif bot == 1:
-			return 1
-		elif bot == 2:
-			return 0
-		else:
-			return 'bot ERROR'
-	elif user == 2:
-		if bot == 0:
-			return 0
-		elif bot == 1:
-			return 2
-		elif bot == 2:
-			return 1
-		else:
-			return 'bot ERROR'
-	else:
-		return 'user ERROR'
 
-def reconHand(img, svm):
+# 0: 剪刀
+# 1: 石頭
+# 2: 布
+SCISSORS = 0
+ROCK = 1
+PAPER = 2
+# 10: user loss
+# 11: user tie
+# 12: user win
+LOSS = 10
+TIE = 11
+WIN = 12
+
+
+# 剪刀石頭布遊戲邏輯
+def resultRockPaperScissors(user, bot):
+	if user == SCISSORS:
+		if bot == SCISSORS:
+			return TIE
+		elif bot == ROCK:
+			return LOSS
+		elif bot == PAPER:
+			return WIN
+		else:
+			return -1
+	elif user == ROCK:
+		if bot == SCISSORS:
+			return WIN
+		elif bot == ROCK:
+			return TIE
+		elif bot == PAPER:
+			return LOSS
+		else:
+			return -1
+	elif user == PAPER:
+		if bot == SCISSORS:
+			return LOSS
+		elif bot == ROCK:
+			return WIN
+		elif bot == PAPER:
+			return TIE
+		else:
+			return -1
+	else:
+		return -1
+
+
+# 手部辨識
+def identifyHand(img, svm):
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	img = cv2.resize(img, (500, 500))
 	sift = cv2.SIFT_create()
@@ -51,22 +66,20 @@ def reconHand(img, svm):
 	result = svm.predict(kpts.flatten())
 	return result
 
-# status
-# 0: user loss
-# 1: user tie
-# 2: user win
+
+# 勝負圖片合成
 def combineImg(imgUser, imgBot, status):
-	# load game result imagine for show
+	# 載入勝負圖片
 	imgGameWin = cv2.imread("gameWin.png")
 	imgGameTie = cv2.imread("gameTie.png")
 	imgGameLose = cv2.imread("gameLose.png")
 	resultImg = np.ndarray()
 
-	if status == 0:
+	if status == LOSS:
 		resultImg = np.hstack([imgUser, imgGameLose, imgBot])
-	elif status == 1:
+	elif status == TIE:
 		resultImg = np.hstack([imgUser, imgGameTie, imgBot])
-	elif status == 2:
+	elif status == WIN:
 		resultImg = np.hstack([imgUser, imgGameWin, imgBot])
 	else:
 		return 'combine ERROR'
@@ -74,45 +87,59 @@ def combineImg(imgUser, imgBot, status):
 	resultImg = cv2.resize(resultImg, (900, 300))
 	return resultImg
 
-# 0: 剪刀
-# 1: 石頭
-# 2: 布
-def RockPaperScissors():
-	# load bot imagine for show
+
+# 剪刀石頭布主程式
+def RockPaperScissors(user_hand_img, model):
+	# 載入機器人的手部圖片
 	imgBotRock = cv2.imread("botRock.jpg")
 	imgBotPaper  = cv2.imread("botPaper.jpg")
 	imgBotScissors = cv2.imread("botScissors.jpg")
+	# 手部辨識 & BOT隨機產生手勢
+	userHand = identifyHand(user_hand_img, model)
+	botHand = random.randint(0, 2)
+	# 判斷勝負
+	gameResult = resultRockPaperScissors(userHand, botHand)
 
-	svm = joblib.load("hand_svm.pkl")		# load pre train svm
-	userImg = cv2.imread("user.jpg")		# load user hand input imagine
-	userHand = reconHand(userImg, svm)		# hand to digit
-	botHand = random.randint(0, 2)			# generate bot digit
-
-	gameResult = resultRockPaperScissors(userHand, botHand)	# user win or loss or tie
-
-	# set botImg
-	if botHand == 0:
+	# 設定BOT手部圖片
+	if botHand == SCISSORS:
 		botImg = imgBotScissors
-	elif botHand == 1:
+	elif botHand == ROCK:
 		botImg = imgBotRock
-	elif botHand == 2:
+	elif botHand == PAPER:
 		botImg = imgBotPaper
 
-	gameResultImg = combineImg(userImg, botImg, gameResult)
+	gameResultImg = combineImg(user_hand_img, botImg, gameResult)
 	cv2.imshow("遊戲結果~", gameResultImg)
 
 
-#svm訓練區
-def svmTeacher():
-	# TODO:訓練SVM並使用joblib存到hand_svm.pkl
+# svm訓練區
+def svmTraining(X, Y, model_name):
+	# SVM 訓練
+	model = svm.SVC(kernel='linear', C=1, gamma='auto')
+	model.fit(X, Y)
+
+	print("此次訓練自我良好準確率為: ", model.score(X, Y))
+
+	# 保存model
+	joblib.dump(model, model_name + '.pkl')
+
+
+# svm預測區
+def svmPrediction():
 	pass
+
+
+# 訓練集產生器
+def TrainingDataGenerator():
+
 
 def main():
 	# 訓練
-	svmTeacher()
-	# 剪刀石頭布程式，不包含訓練
+	X, Y = TrainingDataGenerator()
+	svmTraining()
+
+	# 剪刀石頭布主程式，不包含訓練
 	# RockPaperScissors()
-	pass
 
 main()
 
