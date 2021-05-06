@@ -43,6 +43,8 @@ def resultRockPaperScissors(user, bot):
 	else:
 		return 'user ERROR'
 
+
+# 手部判斷 需要SVM 回傳預測結果
 def reconHand(img, svm):
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	img = cv2.resize(img, (500, 500))
@@ -50,6 +52,26 @@ def reconHand(img, svm):
 	kp, des = sift.detectAndCompute(img, None)
 	result = svm.predict(des.flatten())
 	return result
+
+
+# 攝影機 回傳img
+def Camara():
+	# 選擇第二隻攝影機
+	cap = cv2.VideoCapture(1)
+	while(True):
+		# 從攝影機擷取一張影像
+		ret, frame = cap.read()
+		# 顯示圖片
+		cv2.imshow('Camara', frame)
+		# 若按下 q 鍵則離開迴圈
+		if cv2.waitKey(1) & 0xFF == ord('q'):
+			break
+	# 釋放攝影機
+	cap.release()
+	# 關閉所有 OpenCV 視窗
+	cv2.destroyAllWindows()
+	return frame
+
 
 # status
 # 0: user loss
