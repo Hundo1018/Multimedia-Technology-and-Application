@@ -56,8 +56,8 @@ def reconHand(img, svm):
 
 # 攝影機 回傳img
 def Camara():
-	# 選擇第二隻攝影機
-	cap = cv2.VideoCapture(1)
+	# 選擇第一隻攝影機
+	cap = cv2.VideoCapture(0)
 	while(True):
 		# 從攝影機擷取一張影像
 		ret, frame = cap.read()
@@ -110,8 +110,18 @@ def RockPaperScissors():
 	imgBotScissors = cv2.imread("botScissors.jpg")
 
 	svm = joblib.load("hand_svm.pkl")		# load pre train svm
-	userImg = cv2.imread("user.jpg")		# load user hand input imagine
-	userHand = reconHand(userImg, svm)		# hand to digit
+
+	# 使用者輸入影像 判斷是否為 正確輸入
+	while(userHand != 0):
+		print("影像擷取中... 請按Q確定擷取。")
+		userImg = Camara()						# 從攝影機載入影像
+		# userImg = cv2.imread("user.jpg")		# load user hand input imagine
+		userHand = reconHand(userImg, svm)		# 玩家的手 整數
+		if userHand == 0:
+			print("玩家手勢錯誤! 請在試一次")
+		else:
+			print("輸入結果為", userHand)
+
 	botHand = random.randint(0, 2)			# generate bot digit
 
 	gameResult = resultRockPaperScissors(userHand, botHand)	# user win or loss or tie
