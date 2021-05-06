@@ -193,7 +193,7 @@ def svmTeacher():
 		if descriptor is not None:
 			descriptors = np.vstack((descriptors, descriptor))
 
-	k = 4
+	k = 40
 	voc, variance = kmeans(descriptors, k, 20)
 
 	im_features = np.zeros((len(image_paths), k), "float32")
@@ -227,9 +227,11 @@ def svmTeacher():
 
 def main():
 	# 訓練
-	svmTeacher()
+	#clf = joblib.load("hand_svm.pkl")
+	clf = svmTeacher()
+	joblib.dump(clf,"hand_svm.pkl")
 	# 剪刀石頭布程式，不包含訓練
-	# RockPaperScissors()
+	RockPaperScissors()
 	pass
 
 main()
