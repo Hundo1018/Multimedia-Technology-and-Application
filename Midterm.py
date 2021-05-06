@@ -74,6 +74,10 @@ def combineImg(imgUser, imgBot, status):
 	resultImg = cv2.resize(resultImg, (900, 300))
 	return resultImg
 
+
+
+
+
 # 0: 剪刀
 # 1: 石頭
 # 2: 布
@@ -227,6 +231,7 @@ def main():
 	svmTeacher()
 	# 剪刀石頭布程式，不包含訓練
 	# RockPaperScissors()
+
 	pass
 
 main()
