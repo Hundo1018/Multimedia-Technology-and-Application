@@ -188,15 +188,18 @@ def svmTeacher():
 		des_list.append((image_path, des))
 		print("Image file path : ", image_path)
 
-	descriptors = des_list[0][1]
+	descriptors = des_list[1][1]
 	for image_path, descriptor in des_list[1:]:
-		descriptors = np.vstack((descriptors, descriptor))
+		if descriptor is not None:
+			descriptors = np.vstack((descriptors, descriptor))
 
 	k = 4
 	voc, variance = kmeans(descriptors, k, 20)
 
 	im_features = np.zeros((len(image_paths), k), "float32")
 	for i in range(len(image_paths)):
+		if des_list[i][1] is None:
+			continue
 		words, distance = vq(des_list[i][1], voc)
 		for w in words:
 			im_features[i][w] += 1
