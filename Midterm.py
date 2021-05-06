@@ -70,7 +70,7 @@ def Camara():
 	cap.release()
 	# 關閉所有 OpenCV 視窗
 	cv2.destroyAllWindows()
-	return frame
+	return cv2.resize(frame, (500, 500))
 
 
 # status
@@ -162,7 +162,7 @@ def RockPaperScissors():
 	for image_path in image_paths:
 		im = cv2.imread(image_path)
 		im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-		im = cv2.resize(im, (300, 200))
+		im = cv2.resize(im, (500, 500))
 		kpts = sift.detect(im)
 		kpts, des = sift.compute(im, kpts)
 		des_list.append((image_path, des))
@@ -223,13 +223,13 @@ def svmTeacher():
 	for image_path in image_paths:
 		im = cv2.imread(image_path)
 		im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-		im = cv2.resize(im, (300, 200))
+		im = cv2.resize(im, (500, 500))
 		kpts = sift.detect(im)
 		kpts, des = sift.compute(im, kpts)
 		des_list.append((image_path, des))
 		print("Image file path : ", image_path)
 
-	descriptors = des_list[1][1]
+	descriptors = des_list[0][1]
 	for image_path, descriptor in des_list[1:]:
 		if descriptor is not None:
 			descriptors = np.vstack((descriptors, descriptor))
@@ -269,10 +269,10 @@ def svmTeacher():
 def main():
 	# 訓練
 	#clf = joblib.load("hand_svm.pkl")
-	# clf = svmTeacher()
-	# joblib.dump(clf,"hand_svm.pkl")
+	clf = svmTeacher()
+	joblib.dump(clf,"hand_svm.pkl")
 	# 剪刀石頭布程式，不包含訓練
-	RockPaperScissors()
+	# RockPaperScissors()
 	pass
 
 main()
