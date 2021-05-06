@@ -82,7 +82,9 @@ def combineImg(imgUser, imgBot, status):
 	imgGameWin = cv2.imread("gameWin.png")
 	imgGameTie = cv2.imread("gameTie.png")
 	imgGameLose = cv2.imread("gameLose.png")
-	resultImg = np.ndarray()
+	resultImg = imgUser
+
+	print(imgUser.shape, imgBot.shape)
 
 	if status == 0:
 		resultImg = np.hstack([imgUser, imgGameLose, imgBot])
@@ -106,13 +108,16 @@ def combineImg(imgUser, imgBot, status):
 def RockPaperScissors():
 	# load bot imagine for show
 	imgBotRock = cv2.imread("botRock.jpg")
-	imgBotPaper  = cv2.imread("botPaper.jpg")
+	imgBotPaper = cv2.imread("botPaper.jpg")
 	imgBotScissors = cv2.imread("botScissors.jpg")
 
 	svm = joblib.load("hand_svm.pkl")		# load pre train svm
 
+
 	# 使用者輸入影像 判斷是否為 正確輸入
-	while(userHand != 0):
+	userHand = 0
+	userImg = None
+	while(userHand == 0):
 		print("影像擷取中... 請按Q確定擷取。")
 		userImg = Camara()						# 從攝影機載入影像
 		# userImg = cv2.imread("user.jpg")		# load user hand input imagine
@@ -264,8 +269,8 @@ def svmTeacher():
 def main():
 	# 訓練
 	#clf = joblib.load("hand_svm.pkl")
-	clf = svmTeacher()
-	joblib.dump(clf,"hand_svm.pkl")
+	# clf = svmTeacher()
+	# joblib.dump(clf,"hand_svm.pkl")
 	# 剪刀石頭布程式，不包含訓練
 	RockPaperScissors()
 	pass
