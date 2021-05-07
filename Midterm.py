@@ -5,62 +5,52 @@ import random
 import joblib
 from sklearn.model_selection import train_test_split
 from sklearn import svm
+from sklearn.datasets import load_svmlight_files
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.vq import *
 from imutils import paths
 
+
 # 0: user loss
 # 1: user tie
 # 2: user win
+
+# user:
+# 其他
+# 布
+# 石頭
+# 剪刀
 def resultRockPaperScissors(user, bot):
-	if user == 0:
-		if bot == 0:
-			return 1
-		elif bot == 1:
-			return 0
-		elif bot == 2:
-			return 2
-		else:
-			return 'bot ERROR'
-	elif user == 1:
-		if bot == 0:
-			return 2
-		elif bot == 1:
-			return 1
-		elif bot == 2:
-			return 0
-		else:
-			return 'bot ERROR'
-	elif user == 2:
-		if bot == 0:
-			return 0
-		elif bot == 1:
-			return 2
-		elif bot == 2:
-			return 1
-		else:
-			return 'bot ERROR'
-	else:
+	if user == 0 or bot == 0:
 		return 'user ERROR'
+	if user == bot:
+		return 1
+	if user == bot-1:
+		return 2
+	else:
+		return 0
 
 
 # 手部判斷 需要SVM 回傳預測結果
 def reconHand(img, svm):
-	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	img = cv2.resize(img, (500, 500))
-	sift = cv2.SIFT_create()
+	img = cv2.bilateralFilter(img,19,75,75)
+
+	sift = cv2.xfeatures2d.SIFT_create()
 	kp, des = sift.detectAndCompute(img, None)
-	result = svm.predict(des.flatten())
+	result = svm.predict(des)
 	return result
 
 
 # 攝影機 回傳img
 def Camara():
 	# 選擇第一隻攝影機
-	cap = cv2.VideoCapture(0)
+	cap = cv2.VideoCapture(2)
 	while(True):
 		# 從攝影機擷取一張影像
 		ret, frame = cap.read()
+		frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+		frame = cv2.resize(frame, (500, 500))
 		# 顯示圖片
 		cv2.imshow('Camara', frame)
 		# 若按下 q 鍵則離開迴圈
@@ -79,11 +69,18 @@ def Camara():
 # 2: user win
 def combineImg(imgUser, imgBot, status):
 	# load game result imagine for show
-	imgGameWin = cv2.imread("gameWin.png")
-	imgGameTie = cv2.imread("gameTie.png")
-	imgGameLose = cv2.imread("gameLose.png")
-	resultImg = imgUser
+	imgGameWin = cv2.resize(cv2.imread("gameWin.png"),(500,500))
+	imgGameTie = cv2.resize(cv2.imread("gameTie.png"),(500,500))
+	imgGameLose =cv2.resize( cv2.imread("gameLose.png"),(500,500))
 
+	imgGameWin=cv2.cvtColor(imgGameWin ,cv2.COLOR_BGR2GRAY)
+	imgGameTie=cv2.cvtColor(imgGameTie ,cv2.COLOR_BGR2GRAY)
+	imgGameLose=cv2.cvtColor(imgGameLose,cv2.COLOR_BGR2GRAY)
+
+
+	resultImg = imgUser
+	imgBot = cv2.cvtColor(imgBot,cv2.COLOR_BGR2GRAY)
+	imgBot = np.resize(imgBot,(500,500))
 	print(imgUser.shape, imgBot.shape)
 
 	if status == 0:
@@ -95,16 +92,17 @@ def combineImg(imgUser, imgBot, status):
 	else:
 		return 'combine ERROR'
 
-	resultImg = cv2.resize(resultImg, (900, 300))
+	resultImg = cv2.resize(resultImg, (1500, 500))
 	return resultImg
 
 
 
 
 
-# 0: 剪刀
-# 1: 石頭
-# 2: 布
+# 0: 其他
+# 1: 布
+# 2: 石頭
+# 3: 剪刀
 def RockPaperScissors():
 	# load bot imagine for show
 	imgBotRock = cv2.imread("botRock.jpg")
@@ -121,27 +119,30 @@ def RockPaperScissors():
 		print("影像擷取中... 請按Q確定擷取。")
 		userImg = Camara()						# 從攝影機載入影像
 		# userImg = cv2.imread("user.jpg")		# load user hand input imagine
-		userHand = reconHand(userImg, svm)		# 玩家的手 整數
+		userHand = reconHand(userImg, svm)[0]		# 玩家的手 整數
+		print(userHand)
 		if userHand == 0:
 			print("玩家手勢錯誤! 請在試一次")
 		else:
 			print("輸入結果為", userHand)
 
-	botHand = random.randint(0, 2)			# generate bot digit
+	botHand = random.randint(1, 3)			# generate bot digit
 
 	gameResult = resultRockPaperScissors(userHand, botHand)	# user win or loss or tie
 
 	# set botImg
-	if botHand == 0:
-		botImg = imgBotScissors
-	elif botHand == 1:
-		botImg = imgBotRock
-	elif botHand == 2:
+	if botHand == 1:
 		botImg = imgBotPaper
-
+	elif botHand == 2:
+		botImg = imgBotRock
+	elif botHand == 3:
+		botImg = imgBotScissors
+	botImg = cv2.resize(botImg,(500,500))
 	gameResultImg = combineImg(userImg, botImg, gameResult)
-	cv2.imshow("遊戲結果~", gameResultImg)
 
+	cv2.imshow("遊戲結果~", gameResultImg)
+	cv2.waitKey(0)
+'''
 	train_path = "dataset/train"
 	training_names = os.listdir(train_path)
 
@@ -155,7 +156,7 @@ def RockPaperScissors():
 		image_classes += [class_id] * len(class_path)
 		class_id += 1
 
-	sift = cv2.SIFT_create()
+	sift = cv2.xfeatures2d.SIFT_create()
 
 	des_list = []
 
@@ -163,6 +164,7 @@ def RockPaperScissors():
 		im = cv2.imread(image_path)
 		im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 		im = cv2.resize(im, (500, 500))
+		im = cv2.bilateralFilter(im,19,75,75)
 		kpts = sift.detect(im)
 		kpts, des = sift.compute(im, kpts)
 		des_list.append((image_path, des))
@@ -237,7 +239,7 @@ def svmTeacher():
 	k = 40
 	voc, variance = kmeans(descriptors, k, 20)
 
-	im_features = np.zeros((len(image_paths), k), "float32")
+	im_features = np.zeros((len(image_paths), 128), "float32")
 	for i in range(len(image_paths)):
 		if des_list[i][1] is None:
 			continue
@@ -264,12 +266,12 @@ def svmTeacher():
 
 
 	return clf
-
+'''
 def main():
 	# 訓練
-	#clf = joblib.load("hand_svm.pkl")
-	clf = svmTeacher()
-	joblib.dump(clf,"hand_svm.pkl")
+	clf = joblib.load("hand_svm.pkl")
+	#clf = svmTeacher()
+	#joblib.dump(clf,"hand_svm.pkl")
 	# 剪刀石頭布程式，不包含訓練
 	RockPaperScissors()
 	pass
