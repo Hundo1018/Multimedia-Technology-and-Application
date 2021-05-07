@@ -264,7 +264,6 @@ def svmTeacher():
 
 
 	return clf
-	pass
 
 def main():
 	# 訓練
@@ -272,7 +271,7 @@ def main():
 	clf = svmTeacher()
 	joblib.dump(clf,"hand_svm.pkl")
 	# 剪刀石頭布程式，不包含訓練
-	# RockPaperScissors()
+	RockPaperScissors()
 	pass
 
 main()
